@@ -183,6 +183,50 @@ rspec spec/path/to/file_spec.rb:LINE_NUMBER
 
 The test configuration captures standard output and standard error during test execution. This prevents test output from cluttering your terminal while running tests.
 
+## Known Issues
+
+### Thor/RSpec Warning Issue
+
+There is a known issue with Thor and RSpec where running RSpec tests may produce warnings related to Thor commands. This is due to a conflict between Thor's command-line parsing and RSpec's test execution.
+
+#### Workarounds
+
+1. **Suppress Warnings**: You can suppress the warnings by setting the `THOR_SILENCE_DEPRECATION` environment variable to `true`:
+   ```bash
+   export THOR_SILENCE_DEPRECATION=true
+   ```
+
+2. **Use Bundler Exec**: Run RSpec tests using `bundle exec` to ensure the correct environment is used:
+   ```bash
+   bundle exec rspec
+   ```
+
+3. **Update Dependencies**: Ensure you have the latest versions of Thor and RSpec installed, as updates may resolve the issue:
+   ```bash
+   bundle update thor rspec
+   ```
+
+4. **Use Instance Doubles**: Create a specific double for ClientLookup instead of using `allow_any_instance_of`:
+   ```ruby
+   it "outputs a message when no duplicate emails are found" do
+     # Create an instance and stub it directly
+     client_lookup = ClientLookup.new
+     
+     mock_clients = [
+       double("Client", email: "user1@example.com", full_name: "User One", id: 1),
+       double("Client", email: "user2@example.com", full_name: "User Two", id: 2)
+     ]
+     
+     # Mock on the specific instance
+     allow(client_lookup).to receive(:client_data).and_return(mock_clients)
+     
+     # Call instance method directly
+     expect { client_lookup.duplicate_emails }.to output(/No duplicate email addresses found/).to_stdout
+   end
+   ```
+
+5. **Ignore the Warning**: If the warning does not affect your tests, you can choose to ignore it.
+
 ## Troubleshooting
 
 If you encounter any issues, please check the following:
@@ -190,3 +234,12 @@ If you encounter any issues, please check the following:
 - Ensure you have the correct version of Ruby installed.
 - Verify that all dependencies are installed by running `bundle install`.
 - Check the configuration in your `.env` file.
+
+## Contributing
+
+If you would like to contribute to this project, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Make your changes.
+4. Submit a pull request.

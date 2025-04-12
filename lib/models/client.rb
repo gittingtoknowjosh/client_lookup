@@ -13,8 +13,17 @@ module Models
       
       # Case insensitive name matching
       def name_matches?(search_term)
-        search_term = search_term.to_s.downcase
-        full_name.to_s.downcase.include?(search_term)
+        # Handle nil or empty search term
+        return false if search_term.nil? || search_term.strip.empty?
+        
+        # Normalize the search term (downcase and normalize spaces)
+        normalized_search = search_term.to_s.downcase.gsub(/\s+/, ' ')
+        
+        # Normalize the full name (downcase and normalize spaces)
+        normalized_name = full_name.to_s.downcase.gsub(/\s+/, ' ')
+        
+        # Check if normalized name contains the normalized search term
+        normalized_name.include?(normalized_search)
       end
       
       # Formatted display of client for CLI
