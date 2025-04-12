@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+# Load environment variables from .env file if present
+begin
+    require 'dotenv'
+    env_file = File.join(Dir.pwd, '.env')
+    
+    if File.exist?(env_file)
+        Dotenv.load
+        puts "Successfully loaded environment from .env file"
+    else
+        puts "\e[33m No .env file found. Using system environment variables only.\e[0m"  # Yellow text
+    end
+rescue LoadError
+    warn "\e[31mNote: dotenv gem not found. Using system environment variables only.\e[0m"  # Red text
+end
+
+require_relative '../lib/client_lookup.rb'
+
+ClientLookup.start(ARGV)
