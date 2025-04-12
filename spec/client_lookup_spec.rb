@@ -6,14 +6,14 @@ RSpec.describe ClientLookup do
         it "outputs a search message with the provided name" do
             expect {
                 described_class.start(["name", "Josh"])
-            }.to output(/Searching for client\(s\) with name: Josh/).to_stdout
+            }.to output(/Searching for client\(s\) with full_name matching: Josh/).to_stdout
         end
 
         it "outputs a message when no clients are found" do
             # Create mock clients that don't match the search term
             mock_clients = [
-                double("Client", name_matches?: false),
-                double("Client", name_matches?: false)
+                double("Client", field_matches?: false),
+                double("Client", field_matches?: false)
             ]
             
             # Mock the client_data method
@@ -21,14 +21,14 @@ RSpec.describe ClientLookup do
             
             expect {
                 described_class.start(["name", "Qwertyuiop"])
-            }.to output(/No clients found matching 'Qwertyuiop'\./).to_stdout
+            }.to output(/No clients found with full_name matching 'Qwertyuiop'\./).to_stdout
         end
 
         it "outputs a message when multiple clients are found" do
             # Create mock clients that match the search term
             mock_clients = [
-                double("Client", name_matches?: true, to_cli_output: "Client 1 details"),
-                double("Client", name_matches?: true, to_cli_output: "Client 2 details")
+                double("Client", field_matches?: true, to_cli_output: "Client 1 details"),
+                double("Client", field_matches?: true, to_cli_output: "Client 2 details")
             ]
             
             # Mock the client_data method
@@ -42,8 +42,8 @@ RSpec.describe ClientLookup do
         it "outputs a message when a single client is found" do
             # Create a single mock client that matches the search term
             mock_clients = [
-                double("Client", name_matches?: true, to_cli_output: "Client details"),
-                double("Client", name_matches?: false)
+                double("Client", field_matches?: true, to_cli_output: "Client details"),
+                double("Client", field_matches?: false)
             ]
             
             # Mock the client_data method
@@ -57,8 +57,8 @@ RSpec.describe ClientLookup do
         it "outputs a message for partial name matches" do
             # Create mock clients with partial name matches
             mock_clients = [
-                double("Client", name_matches?: true, to_cli_output: "Client 1 details"),
-                double("Client", name_matches?: true, to_cli_output: "Client 2 details")
+                double("Client", field_matches?: true, to_cli_output: "Client 1 details"),
+                double("Client", field_matches?: true, to_cli_output: "Client 2 details")
             ]
             
             # Mock the client_data method
@@ -72,7 +72,7 @@ RSpec.describe ClientLookup do
         it "outputs a message for case-insensitive name matches" do
             # Create mock clients with case-insensitive matches
             mock_clients = [
-                double("Client", name_matches?: true, to_cli_output: "Client details")
+                double("Client", field_matches?: true, to_cli_output: "Client details")
             ]
             
             # Mock the client_data method
@@ -171,6 +171,35 @@ RSpec.describe ClientLookup do
             expect {
                 described_class.start(["duplicate_emails"])
             }.to output(/Found 1 duplicate email\(s\)/).to_stdout
+        end
+    end
+
+    describe "#search" do
+        it "outputs a search message with the provided field and term" do
+            expect {
+                described_class.start(["search", "email", "example.com"])
+            }.to output(/Searching for client\(s\) with email matching: example\.com/).to_stdout
+        end
+        
+        it "handles errors for invalid field names" do
+            mock_client = double("Client")
+            allow(mock_client).to receive(:field_matches?).and_raise(ArgumentError.new("Unknown field: invalid_field"))
+            allow_any_instance_of(ClientLookup).to receive(:client_data).and_return([mock_client])
+            
+            expect {
+                described_class.start(["search", "invalid_field", "term"])
+            }.to output(/Error: Unknown field: invalid_field/).to_stdout
+        end
+        
+        it "correctly searches by any valid field" do
+            mock_clients = [
+                double("Client", field_matches?: true, to_cli_output: "Client details")
+            ] 
+            allow_any_instance_of(ClientLookup).to receive(:client_data).and_return(mock_clients)
+            
+            expect {
+                described_class.start(["search", "email", "example"])
+            }.to output(/Found 1 matching client\(s\):/).to_stdout
         end
     end
 end

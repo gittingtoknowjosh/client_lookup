@@ -21,28 +21,40 @@ class ClientLookup < Thor
         end
     end
 
-    desc "name NAME", "Search for a client by name (partial matches included)."
-    def name(search_term)
-        puts "Searching for client(s) with name: #{search_term}"
+    desc "search FIELD TERM", "Search for a client by any field (id, full_name, email)."
+    def search(field, search_term)
+        puts "Searching for client(s) with #{field} matching: #{search_term}"
         # Get the client data
         clients = client_data
         
-        # Search for clients with matching names
-        matching_clients = clients.select { |client| client.name_matches?(search_term) }
+        # Search for clients with matching field values
+        matching_clients = clients.select do |client| 
+            begin
+                client.field_matches?(field, search_term)
+            rescue ArgumentError => e
+                puts "Error: #{e.message}"
+                exit(1)
+            end
+        end
         
         # Display results
         if matching_clients.empty?
-        puts "No clients found matching '#{search_term}'."
+            puts "No clients found with #{field} matching '#{search_term}'."
         else
-        puts "Found #{matching_clients.count} matching client(s):"
-        puts "-" * 50
-        
-        matching_clients.each_with_index do |client, index|
-            puts "Client ##{index + 1}:"
-            puts client.to_cli_output
+            puts "Found #{matching_clients.count} matching client(s):"
             puts "-" * 50
+            
+            matching_clients.each_with_index do |client, index|
+                puts "Client ##{index + 1}:"
+                puts client.to_cli_output
+                puts "-" * 50
+            end
         end
-        end
+    end
+
+    desc "name NAME", "Search for a client by name (partial matches included)."
+    def name(search_term)
+        search('full_name', search_term)
     end
     
     desc "duplicate_emails", "Find clients with the same email addresses."

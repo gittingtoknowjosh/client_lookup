@@ -10,20 +10,35 @@ module Models
         @full_name = attributes['full_name']
         @email = attributes['email']
       end
-      
-      # Case insensitive name matching
-      def name_matches?(search_term)
+
+      def field_matches?(field_name, search_term)
         # Handle nil or empty search term
         return false if search_term.nil? || search_term.strip.empty?
+        
+        # Validate the field exists
+        unless respond_to?(field_name.to_sym)
+          raise ArgumentError, "Unknown field: #{field_name}"
+        end
+        
+        # Get the field value
+        field_value = send(field_name.to_sym)
+        
+        # Handle nil field value
+        return false if field_value.nil?
         
         # Normalize the search term (downcase and normalize spaces)
         normalized_search = search_term.to_s.downcase.gsub(/\s+/, ' ')
         
-        # Normalize the full name (downcase and normalize spaces)
-        normalized_name = full_name.to_s.downcase.gsub(/\s+/, ' ')
+        # Normalize the field value (downcase and normalize spaces)
+        normalized_value = field_value.to_s.downcase.gsub(/\s+/, ' ')
         
-        # Check if normalized name contains the normalized search term
-        normalized_name.include?(normalized_search)
+        # Check if normalized value contains the normalized search term
+        normalized_value.include?(normalized_search)
+      end
+      
+      # Case insensitive name matching
+      def name_matches?(search_term)
+        return field_matches?(:full_name, search_term)
       end
       
       # Formatted display of client for CLI
