@@ -227,6 +227,30 @@ There is a known issue with Thor and RSpec where running RSpec tests may produce
 
 5. **Ignore the Warning**: If the warning does not affect your tests, you can choose to ignore it.
 
+## Known Limitations and Areas for Future Improvement
+
+### Current Implementation
+The Client model currently supports basic fields only: `id`, `full_name`, and `email`.
+
+### Limitations & Future Improvements
+
+1. **Client Information**:
+   - Limited to basic contact information
+   - Future: Add support for addresses, phone numbers, and custom fields
+
+2. **Search Capabilities**:
+   - Currently uses simple substring matching
+   - Future: Implement fuzzy matching, advanced filters, and search ranking
+
+3. **Data Structure**:
+   - No support for nested data or relationships
+   - Future: Add support for complex data relationships and enhanced validation
+
+4. **Performance**:
+   - Future: Implement pagination, caching, and optimization for large datasets
+
+Additional planned features include data export, audit logging, and external system integration.
+
 ## Troubleshooting
 
 If you encounter any issues, please check the following:
