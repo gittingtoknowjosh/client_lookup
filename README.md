@@ -9,7 +9,22 @@ A Ruby CLI tool for efficiently looking up client information from JSON data.
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
+  - [Command Line Interface](#command-line-interface)
+  - [Available Commands](#available-commands)
+  - [Search by Name](#search-by-name)
+  - [Find Duplicate Emails](#find-duplicate-emails)
+  - [Client Data Source](#client-data-source)
 - [Running Tests](#running-tests)
+  - [Prerequisites](#prerequisites-1)
+  - [Running All Tests](#running-all-tests)
+  - [Running Specific Tests](#running-specific-tests)
+  - [Test Output](#test-output)
+- [Known Issues](#known-issues)
+  - [Thor/RSpec Warning Issue](#thorrspec-warning-issue)
+- [Known Limitations and Future Improvements](#known-limitations-and-areas-for-future-improvement)
+  - [Current Implementation](#current-implementation)
+  - [Limitations & Future Improvements](#limitations--future-improvements)
+- [Assumptions and Decisions Made](#assumptions-and-decisions-made)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 
@@ -55,12 +70,12 @@ The Client Lookup application is a command-line tool that provides a fast and re
 Client Lookup is built using [Thor](https://github.com/rails/thor), a toolkit for building powerful command-line interfaces. This provides us with a consistent interface for all commands, built-in help functionality, and options parsing.
 
 To see all available commands:
-```
+```bash
 client_lookup help
 ```
 
 To get help for a specific command:
-```
+```bash
 client_lookup help [COMMAND]
 ```
 
@@ -106,7 +121,7 @@ To find clients with duplicate email addresses:
 ```
 
 Example output:
-```
+```bash
 Searching for clients with duplicate email addresses...
 Found 1 duplicate email(s):
 --------------------------------------------------
@@ -120,7 +135,7 @@ Duplicate Email #1: duplicate@example.com
 The application needs to know where to find client data. You can specify the source using the `client_json_path` option in any of the following ways:
 
 - As a command line option:
-  ```
+  ```bash
   # Using the long-form --client-json-path
   client_lookup name "John" --client-json-path=/path/to/clients.json
   # OR
@@ -129,7 +144,7 @@ The application needs to know where to find client data. You can specify the sou
   ```
 
 - As an environment variable:
-  ```
+  ```bash
   export CLIENT_JSON_PATH=/path/to/clients.json
   ```
 
@@ -249,7 +264,38 @@ The Client model currently supports basic fields only: `id`, `full_name`, and `e
 4. **Performance**:
    - Future: Implement pagination, caching, and optimization for large datasets
 
-Additional planned features include data export, audit logging, and external system integration.
+5. **Application Interface**:
+   - Currently available as CLI tool only
+   - Future: Package as a Ruby gem and restructure as a Rails application that uses this gem to provide RESTful API endpoints
+
+6. **Data Sources**:
+   - Limited to a single JSON file or endpoint at a time
+   - Future: Support searching across multiple JSON files or endpoints simultaneously
+
+## Assumptions and Decisions Made
+
+During the development of this application, several key assumptions and architectural decisions were made:
+
+1. **Data Format**:
+   - JSON was chosen as the primary data format for its simplicity and widespread use
+   - Assumed that client data would be available either locally or via HTTP endpoint
+
+2. **Command Line Interface**:
+   - Thor was selected for CLI implementation due to its robust command structure and built-in help system
+   - Commands were designed to be intuitive and follow Unix command conventions
+
+3. **Search Implementation**:
+   - Case-insensitive substring matching was implemented as a balance between accuracy and performance
+   - Assumed that exact field names would be used for filtering (no field aliases)
+
+4. **Error Handling**:
+   - Graceful error handling with user-friendly messages was prioritized over strict validation
+
+5. **Testing Approach**:
+   - Unit tests focus on core business logic rather than CLI interaction
+   - Mock objects are used to isolate tests from external dependencies
+
+These decisions were made with the intention of creating a maintainable, user-friendly tool that can be extended in the future.
 
 ## Troubleshooting
 
