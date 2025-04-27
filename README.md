@@ -65,18 +65,52 @@ The Client Lookup application is a command-line tool that provides a fast and re
 
 ## Usage
 
+### Running the CLI Tool
+
+You have several options for running the Client Lookup CLI:
+
+#### Option 1: Using Ruby directly
+
+```bash
+# On Unix/Linux/macOS/WSL
+ruby bin/client_lookup [COMMAND] [ARGUMENTS]
+
+# On Windows
+ruby bin\client_lookup [COMMAND] [ARGUMENTS]
+```
+
+#### Option 2: Make the script executable (Unix/Linux/macOS/WSL)
+
+Make the script executable once:
+```bash
+chmod +x bin/client_lookup
+```
+
+Then run it directly:
+```bash
+./bin/client_lookup [COMMAND] [ARGUMENTS]
+```
+
+#### Option 3: Using Bundler
+
+```bash
+bundle exec ruby bin/client_lookup [COMMAND] [ARGUMENTS]
+```
+
 ### Command Line Interface
 
 Client Lookup is built using [Thor](https://github.com/rails/thor), a toolkit for building powerful command-line interfaces. This provides us with a consistent interface for all commands, built-in help functionality, and options parsing.
 
+**NOTE: This is using Bundler.**
+
 To see all available commands:
 ```bash
-client_lookup help
+bundle exec ruby bin/client_lookup help
 ```
 
 To get help for a specific command:
 ```bash
-client_lookup help [COMMAND]
+bundle exec ruby bin/client_lookup help [COMMAND]
 ```
 
 ### Available Commands
@@ -84,7 +118,7 @@ client_lookup help [COMMAND]
 To see all available commands:
 
 ```bash
-./bin/client_lookup help
+bundle exec ruby bin/client_lookup help
 ```
 
 ### Search by Name
@@ -92,7 +126,7 @@ To see all available commands:
 To search for clients by name (including partial matches):
 
 ```bash
-./bin/client_lookup name "John"
+bundle exec ruby bin/client_lookup name "John"
 ```
 
 Example output:
@@ -117,7 +151,7 @@ Email: johnny.appleseed@example.com
 To find clients with duplicate email addresses:
 
 ```bash
-./bin/client_lookup duplicate_emails
+bundle exec ruby bin/client_lookup duplicate_emails
 ```
 
 Example output:
@@ -137,10 +171,10 @@ The application needs to know where to find client data. You can specify the sou
 - As a command line option:
   ```bash
   # Using the long-form --client-json-path
-  client_lookup name "John" --client-json-path=/path/to/clients.json
+  bundle exec ruby bin/client_lookup name "John" --client-json-path=/path/to/clients.json
   # OR
   # Using the alias --json
-  client_lookup duplicate_emails --json=https://api.example.com/clients
+  bundle exec ruby bin/client_lookup duplicate_emails --json=https://api.example.com/clients
   ```
 
 - As an environment variable:
